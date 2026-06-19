@@ -92,6 +92,51 @@ local hit = exports.CTQui:SkillCheck({ key = 'E', durationMs = 2600, zoneDeg = 5
 exports.CTQui:Notify({ description = hit and 'Success!' or 'Failed', type = hit and 'success' or 'error' })
 ```
 
+## Icons
+
+Every component that shows an icon (`Notify`, menu/context items, `OpenRadial`,
+`Progress`, …) takes an **`icon`** string. CTQui auto-detects what you pass — so
+icons are set per-call through the export, never hardcoded:
+
+| You pass | Renders as | Example |
+| -------- | ---------- | ------- |
+| An **emoji** | text glyph | `icon = '🚗'` |
+| A **Font Awesome** class | `<i class="…">` | `icon = 'fa-solid fa-car'` |
+| An **image URL / path** | `<img>` | `icon = 'https://…/badge.png'` or `'nui://myres/img/x.png'` |
+
+Detection rule: the string contains `fa-` → Font Awesome; it's a URL or ends in
+`.png/.jpg/.gif/.svg/.webp` → image; otherwise → emoji/text.
+
+### Adding or changing an icon
+
+Just change the string you pass — no edits to CTQui needed:
+
+```lua
+exports.CTQui:Notify({ title = 'Garage', description = 'Stored', icon = 'fa-solid fa-warehouse' })
+exports.CTQui:OpenContext({ title = 'Phone', items = {
+  { id = 'msgs', title = 'Messages', icon = 'fa-solid fa-message' },
+  { id = 'bank', title = 'Bank',     icon = '💳' },                     -- emoji
+  { id = 'app',  title = 'My App',   icon = 'nui://myresource/ui/app.png' }, -- image
+} })
+```
+
+### Font Awesome setup
+
+Browse icons at **https://fontawesome.com/icons** and copy the **full class** shown
+for each icon (e.g. `fa-solid fa-house`, `fa-brands fa-discord`). Free icons work
+out of the box; **Pro** icons need your own Pro kit (point `Config.FontAwesomeUrl`
+at it).
+
+`Config.FontAwesomeUrl` (in `config.lua`) controls the stylesheet:
+
+- **Default** — loads Font Awesome Free from a CDN (needs internet on the client).
+- **Self-host (recommended for production):** download Font Awesome Free, drop its
+  `css/` + `webfonts/` into `web/fontawesome/`, add those files to `fxmanifest.lua`
+  (`files { 'web/fontawesome/**' }`), and set
+  `Config.FontAwesomeUrl = 'fontawesome/css/all.min.css'`.
+- **Disable entirely:** set `Config.FontAwesomeUrl = false` (emoji + image icons
+  still work).
+
 ## Theming
 
 Edit `config.lua` → `Config.Theme` (accent colours, corner radius, font) and

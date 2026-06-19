@@ -16,4 +16,10 @@ Config.NotifyPosition = 'top-right'
 -- Default notification lifetime (ms).
 Config.NotifyDuration = 4000
 
+-- Icons. Any component's `icon` field accepts an emoji ('🚗'), a Font Awesome
+-- class ('fa-solid fa-car') or an image URL/path. This is the stylesheet used for
+-- Font Awesome classes. Swap it to self-host (recommended — see README), or set
+-- to false to disable Font Awesome entirely (emoji + images still work).
+Config.FontAwesomeUrl = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css'
+
 Config.Debug = false

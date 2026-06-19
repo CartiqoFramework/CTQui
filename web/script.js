@@ -30,6 +30,35 @@
 		}).catch(() => {});
 	}
 
+	// ── Icons ──────────────────────────────────────────────────────────────────
+	// An `icon` string can be an emoji, a Font Awesome class, or an image URL/path.
+	// The right element is chosen at runtime — nothing is hardcoded.
+	function iconNode(icon) {
+		if (icon == null || icon === '') return null;
+		const s = String(icon).trim();
+		// Font Awesome: any class containing an "fa-…" token (e.g. "fa-solid fa-car").
+		if (s.includes('fa-')) {
+			const i = document.createElement('i');
+			i.className = s;
+			return i;
+		}
+		// Image: a URL or a path ending in an image extension (incl. nui://).
+		if (/^\w+:\/\//.test(s) || /\.(png|jpe?g|gif|svg|webp)$/i.test(s)) {
+			const img = document.createElement('img');
+			img.className = 'ctqui-img-icon';
+			img.src = s;
+			return img;
+		}
+		// Otherwise treat it as text (emoji or any glyph).
+		return document.createTextNode(s);
+	}
+	// Render `icon` into `container`, falling back to `fallback` text when empty.
+	function applyIcon(container, icon, fallback) {
+		container.textContent = '';
+		const node = iconNode(icon) || (fallback != null ? document.createTextNode(fallback) : null);
+		if (node) container.appendChild(node);
+	}
+
 	// ── Config / theming ─────────────────────────────────────────────────────
 	function applyConfig(data) {
 		const t = data.theme || {};
@@ -39,6 +68,21 @@
 		if (t.font) root.style.setProperty('--ctqui-font', t.font);
 		if (data.notifyPosition) {
 			els.notifications.className = 'pos-' + data.notifyPosition;
+		}
+		// Swap / remove the Font Awesome stylesheet (Config.FontAwesomeUrl).
+		if (data.fontAwesomeUrl !== undefined) {
+			let link = document.getElementById('ctqui-fa');
+			if (data.fontAwesomeUrl) {
+				if (!link) {
+					link = document.createElement('link');
+					link.id = 'ctqui-fa';
+					link.rel = 'stylesheet';
+					document.head.appendChild(link);
+				}
+				link.href = data.fontAwesomeUrl;
+			} else if (link) {
+				link.remove();
+			}
 		}
 	}
 
@@ -52,7 +96,7 @@
 
 		const icon = document.createElement('div');
 		icon.className = 'ctqui-toast-icon';
-		icon.textContent = d.icon || NOTIFY_GLYPH[type];
+		applyIcon(icon, d.icon, NOTIFY_GLYPH[type]);
 
 		const body = document.createElement('div');
 		body.className = 'ctqui-toast-body';
@@ -107,7 +151,11 @@
 		// Build the bar: icon + title + description + live percentage.
 		els.progress.innerHTML = '';
 		const top = el('div', 'ctqui-progress-top');
-		if (d.icon) top.appendChild(el('div', 'ctqui-progress-icon', d.icon));
+		if (d.icon) {
+			const pic = el('div', 'ctqui-progress-icon');
+			applyIcon(pic, d.icon);
+			top.appendChild(pic);
+		}
 		const main = el('div', 'ctqui-progress-main');
 		main.appendChild(el('div', 'ctqui-progress-title', d.title || d.label || 'Please wait'));
 		if (d.description) main.appendChild(el('div', 'ctqui-progress-desc', d.description));
@@ -217,7 +265,11 @@
 	function row(icon, label, desc, arrow) {
 		const r = el('button', 'ctqui-row');
 		r.type = 'button';
-		if (icon) r.appendChild(el('span', 'ctqui-row-icon', icon));
+		if (icon) {
+			const ic = el('span', 'ctqui-row-icon');
+			applyIcon(ic, icon);
+			r.appendChild(ic);
+		}
 		const body = el('div', 'ctqui-row-body');
 		body.appendChild(el('div', 'ctqui-row-label', label || ''));
 		if (desc) body.appendChild(el('div', 'ctqui-row-desc', desc));
@@ -491,7 +543,9 @@
 			item.type = 'button';
 			item.style.left = cx + r * Math.cos(ang) + 'px';
 			item.style.top = cy + r * Math.sin(ang) + 'px';
-			item.appendChild(el('div', 'ctqui-radial-icon', it.icon || '•'));
+			const ric = el('div', 'ctqui-radial-icon');
+			applyIcon(ric, it.icon, '•');
+			item.appendChild(ric);
 			item.appendChild(el('div', 'ctqui-radial-label', it.label || ''));
 			item.onclick = () => submit(it.value);
 			wrap.appendChild(item);

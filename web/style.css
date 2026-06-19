@@ -35,6 +35,14 @@ html, body {
 	display: none !important;
 }
 
+/* Image-URL icons render inside the round/square icon boxes. */
+.ctqui-img-icon {
+	width: 70%;
+	height: 70%;
+	object-fit: contain;
+	border-radius: 6px;
+}
+
 /* ── Notifications ───────────────────────────────────────────────────────── */
 #ctqui-notifications {
 	position: fixed;

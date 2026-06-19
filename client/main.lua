@@ -8,7 +8,11 @@ end
 AddEventHandler('onClientResourceStart', function(res)
 	if res ~= GetCurrentResourceName() then return end
 	Wait(50)
-	send('config', { theme = Config.Theme, notifyPosition = Config.NotifyPosition })
+	send('config', {
+		theme = Config.Theme,
+		notifyPosition = Config.NotifyPosition,
+		fontAwesomeUrl = Config.FontAwesomeUrl,
+	})
 end)
 
 -- ── Notifications ───────────────────────────────────────────────────────────
