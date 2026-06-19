@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<!-- Notifications stack -->
+	<div id="ctqui-notifications" class="pos-top-right"></div>
+
+	<!-- Text UI prompt -->
+	<div id="ctqui-textui" class="hidden">
+		<span class="ctqui-key" id="ctqui-textui-key"></span>
+		<span class="ctqui-textui-label" id="ctqui-textui-text"></span>
+	</div>
+
+	<!-- Progress bar -->
+	<div id="ctqui-progress" class="hidden">
+		<div class="ctqui-progress-head">
+			<span id="ctqui-progress-label"></span>
+			<span id="ctqui-progress-cancel" class="ctqui-progress-cancel hidden">[X] cancel</span>
+		</div>
+		<div class="ctqui-progress-track">
+			<div class="ctqui-progress-fill" id="ctqui-progress-fill"></div>
+		</div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+</html>

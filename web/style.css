@@ -1,0 +1,189 @@
+/* CTQui — original modern NUI styling. Everything themable via CSS variables set
+   from config.lua (see script.js applyConfig). */
+:root {
+	--ctqui-accent: #a855f7;
+	--ctqui-accent2: #7c3aed;
+	--ctqui-radius: 14px;
+	--ctqui-font: Inter, "Segoe UI", system-ui, sans-serif;
+
+	--ctqui-bg: rgba(18, 18, 24, 0.72);
+	--ctqui-border: rgba(255, 255, 255, 0.08);
+	--ctqui-text: #f3f4f6;
+	--ctqui-muted: #9ca3af;
+	--ctqui-good: #33d82d;
+	--ctqui-bad: #fd6161;
+	--ctqui-warn: #f5a524;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: transparent;
+	font-family: var(--ctqui-font);
+	color: var(--ctqui-text);
+	user-select: none;
+}
+
+.hidden {
+	display: none !important;
+}
+
+/* ── Notifications ───────────────────────────────────────────────────────── */
+#ctqui-notifications {
+	position: fixed;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 340px;
+	z-index: 50;
+}
+#ctqui-notifications.pos-top-right { top: 24px; right: 24px; align-items: flex-end; }
+#ctqui-notifications.pos-top-left { top: 24px; left: 24px; align-items: flex-start; }
+#ctqui-notifications.pos-bottom-right { bottom: 24px; right: 24px; align-items: flex-end; }
+#ctqui-notifications.pos-bottom-left { bottom: 24px; left: 24px; align-items: flex-start; }
+#ctqui-notifications.pos-top-center { top: 24px; left: 50%; transform: translateX(-50%); align-items: center; }
+
+.ctqui-toast {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	min-width: 240px;
+	max-width: 340px;
+	padding: 14px 16px;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: var(--ctqui-radius);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+	overflow: hidden;
+	animation: ctqui-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ctqui-toast.leaving {
+	animation: ctqui-slide-out 0.3s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+.ctqui-toast-icon {
+	flex-shrink: 0;
+	width: 34px;
+	height: 34px;
+	display: grid;
+	place-items: center;
+	border-radius: 10px;
+	font-size: 16px;
+	font-weight: 700;
+	background: color-mix(in srgb, var(--ctqui-accent) 18%, transparent);
+	color: var(--ctqui-accent);
+}
+.ctqui-toast.success .ctqui-toast-icon { background: color-mix(in srgb, var(--ctqui-good) 18%, transparent); color: var(--ctqui-good); }
+.ctqui-toast.error   .ctqui-toast-icon { background: color-mix(in srgb, var(--ctqui-bad) 18%, transparent);  color: var(--ctqui-bad); }
+.ctqui-toast.warning .ctqui-toast-icon { background: color-mix(in srgb, var(--ctqui-warn) 18%, transparent); color: var(--ctqui-warn); }
+
+.ctqui-toast-body { flex: 1; min-width: 0; padding-top: 2px; }
+.ctqui-toast-title { font-size: 14px; font-weight: 600; line-height: 1.2; }
+.ctqui-toast-desc { margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--ctqui-muted); word-wrap: break-word; }
+
+.ctqui-toast-bar {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 3px;
+	width: 100%;
+	transform-origin: left;
+	background: linear-gradient(90deg, var(--ctqui-accent), var(--ctqui-accent2));
+}
+.ctqui-toast.success .ctqui-toast-bar { background: var(--ctqui-good); }
+.ctqui-toast.error   .ctqui-toast-bar { background: var(--ctqui-bad); }
+.ctqui-toast.warning .ctqui-toast-bar { background: var(--ctqui-warn); }
+
+/* ── Text UI ─────────────────────────────────────────────────────────────── */
+#ctqui-textui {
+	position: fixed;
+	left: 50%;
+	bottom: 64px;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 16px 10px 12px;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: 999px;
+	backdrop-filter: blur(16px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+	font-size: 14px;
+	animation: ctqui-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+	z-index: 40;
+}
+.ctqui-key {
+	display: inline-grid;
+	place-items: center;
+	min-width: 26px;
+	height: 26px;
+	padding: 0 6px;
+	border-radius: 7px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #fff;
+	background: linear-gradient(135deg, var(--ctqui-accent), var(--ctqui-accent2));
+	box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+.ctqui-key:empty { display: none; }
+.ctqui-textui-label { padding-right: 4px; }
+
+/* ── Progress bar ────────────────────────────────────────────────────────── */
+#ctqui-progress {
+	position: fixed;
+	left: 50%;
+	bottom: 110px;
+	transform: translateX(-50%);
+	width: 340px;
+	padding: 14px 16px;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: var(--ctqui-radius);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+	animation: ctqui-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+	z-index: 45;
+}
+.ctqui-progress-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+.ctqui-progress-cancel { color: var(--ctqui-muted); font-size: 11px; }
+.ctqui-progress-track {
+	height: 8px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
+	overflow: hidden;
+}
+.ctqui-progress-fill {
+	height: 100%;
+	width: 0%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--ctqui-accent), var(--ctqui-accent2));
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes ctqui-slide-in {
+	from { opacity: 0; transform: translateX(24px) scale(0.96); }
+	to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes ctqui-slide-out {
+	to { opacity: 0; transform: translateX(24px) scale(0.96); }
+}
+@keyframes ctqui-pop {
+	from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.97); }
+	to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
