@@ -9,7 +9,10 @@ version '0.1.0'
 ui_page 'web/index.html'
 
 shared_script 'config.lua'
-client_script 'client/main.lua'
+client_scripts {
+	'client/main.lua',
+	'client/interactive.lua',
+}
 
 files {
 	'web/index.html',

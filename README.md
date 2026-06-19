@@ -16,7 +16,16 @@ blocking progress bar — themable from `config.lua`. Built from scratch for CAR
 | ------ | ------------ |
 | `Notify` | Toast notifications (`info` / `success` / `error` / `warning`) with a countdown bar. |
 | `ShowTextUI` / `HideTextUI` | A keypress/interaction prompt pill. |
-| `Progress` | A blocking progress bar; returns `true` on complete, `false` on cancel. |
+| `ShowControls` / `HideControls` | A persistent keybind/controls panel (`{ label, key }` rows). |
+| `Progress` | A blocking progress bar with optional `icon` / `title` / `description` and a live %; returns `true` on complete, `false` on cancel. |
+| `OpenRadial` | A radial (wheel) menu; returns the chosen item's `value`. |
+| `OpenMenu` | A keyboard-navigable list menu; returns the chosen option's `value` (or `nil`). |
+| `OpenContext` | A right-anchored context panel with titled items, right-side values, **status** indicators (`done` / `active` / `locked`) and **submenus** (Esc steps back); returns the chosen item `id`. |
+| `Input` | A modal form — `text` / `number` / `password` / `select` / `checkbox` / `toggle` / `slider`, with optional per-field `description`; returns a values table keyed by field `name`. |
+| `SkillCheck` | A timing minigame — press the key while the pointer is inside the zone; returns `true` (hit) or `false`. |
+
+The interactive components take NUI focus and block until the player submits or
+cancels (Esc / click-outside cancels). Only one is open at a time.
 
 ## Usage
 
@@ -29,9 +38,58 @@ exports.CTQui:Notify('Quick one-liner') -- string shorthand
 exports.CTQui:ShowTextUI('Press to open', { key = 'E' })
 exports.CTQui:HideTextUI()
 
--- Progress (blocking)
-local done = exports.CTQui:Progress({ label = 'Lockpicking…', duration = 5000, canCancel = true })
+-- Progress (blocking) — with icon, title, description and a live %
+local done = exports.CTQui:Progress({
+  title = 'Initializing Hack', icon = '💻', description = 'Bypassing security…',
+  duration = 5000, canCancel = true,
+})
 if done then exports.CTQui:Notify({ description = 'Success!', type = 'success' }) end
+
+-- Controls panel (persistent keybind hints)
+exports.CTQui:ShowControls({ title = 'Controls', items = {
+  { label = 'Move Forward', key = 'W' }, { label = 'Confirm', key = 'SPACE' },
+} })
+exports.CTQui:HideControls()
+
+-- Radial (wheel) menu — returns the chosen value
+local picked = exports.CTQui:OpenRadial({ items = {
+  { label = 'Inventory', icon = '🎒', value = 'inv' },
+  { label = 'Garage', icon = '🚗', value = 'garage' },
+} })
+
+-- List menu (returns the chosen value, or nil)
+local choice = exports.CTQui:OpenMenu({
+  title = 'Vehicle',
+  options = {
+    { label = 'Lock / unlock', description = 'Toggle the doors', icon = '🔒', value = 'lock' },
+    { label = 'Store vehicle', icon = '🅿️', value = 'store' },
+  },
+})
+
+-- Context menu (returns the chosen item id)
+local id = exports.CTQui:OpenContext({
+  title = 'Garage', subtitle = 'Manage your vehicles',
+  items = {
+    { id = 'take', title = 'Take out vehicle', description = 'Spawn your car', icon = '🚗' },
+    { id = 'soon', title = 'Transfer', disabled = true },
+  },
+})
+
+-- Input dialog (returns a values table keyed by field name, or nil)
+local values = exports.CTQui:Input({
+  title = 'Character',
+  fields = {
+    { name = 'firstname', label = 'First name', type = 'text', required = true },
+    { name = 'age', label = 'Age', type = 'number' },
+    { name = 'gender', label = 'Gender', type = 'select', options = { 'Male', 'Female', 'Other' } },
+    { name = 'notify', label = 'Receive notifications', type = 'toggle', default = true },
+    { name = 'volume', label = 'Volume', type = 'slider', min = 0, max = 100, default = 50 },
+  },
+})
+
+-- Skill check (timing minigame) — returns true on a hit
+local hit = exports.CTQui:SkillCheck({ key = 'E', durationMs = 2600, zoneDeg = 55 })
+exports.CTQui:Notify({ description = hit and 'Success!' or 'Failed', type = hit and 'success' or 'error' })
 ```
 
 ## Theming
@@ -43,7 +101,9 @@ variables, so one place restyles everything.
 
 ## Demo
 
-In-game: `/ctqui notify success`, `/ctqui textui`, `/ctqui progress`.
+In-game: `/ctqui notify success`, `/ctqui textui`, `/ctqui progress`,
+`/ctqui controls`, `/ctquimenu`, `/ctquicontext`, `/ctquiinput`, `/ctquiskill`,
+`/ctquiradial`.
 
 ## Install
 

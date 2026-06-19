@@ -175,7 +175,354 @@ html, body {
 	background: linear-gradient(90deg, var(--ctqui-accent), var(--ctqui-accent2));
 }
 
+/* ── Overlay (menu / context / input) ────────────────────────────────────── */
+#ctqui-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.45);
+	backdrop-filter: blur(2px);
+	animation: ctqui-fade 0.18s ease;
+}
+#ctqui-overlay.anchor-right { justify-content: flex-end; align-items: center; padding-right: 40px; }
+
+.ctqui-panel {
+	width: 340px;
+	max-height: 70vh;
+	display: flex;
+	flex-direction: column;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: var(--ctqui-radius);
+	backdrop-filter: blur(18px);
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+	overflow: hidden;
+	animation: ctqui-pop-c 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ctqui-panel-head {
+	padding: 16px 18px;
+	border-bottom: 1px solid var(--ctqui-border);
+}
+.ctqui-panel-title { font-size: 15px; font-weight: 700; }
+.ctqui-panel-sub { margin-top: 2px; font-size: 12px; color: var(--ctqui-muted); }
+
+.ctqui-panel-list { overflow-y: auto; padding: 6px; }
+
+/* Menu / context rows */
+.ctqui-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	padding: 11px 12px;
+	border: none;
+	border-radius: 10px;
+	background: transparent;
+	color: var(--ctqui-text);
+	font-family: inherit;
+	font-size: 13.5px;
+	text-align: left;
+	cursor: pointer;
+	transition: background 0.12s ease;
+}
+.ctqui-row:hover:not(.disabled),
+.ctqui-row.active:not(.disabled) { background: rgba(255, 255, 255, 0.07); }
+.ctqui-row.disabled { opacity: 0.4; cursor: not-allowed; }
+.ctqui-row-icon { flex-shrink: 0; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; background: color-mix(in srgb, var(--ctqui-accent) 16%, transparent); font-size: 15px; }
+.ctqui-row-body { flex: 1; min-width: 0; }
+.ctqui-row-label { font-weight: 600; }
+.ctqui-row-desc { margin-top: 1px; font-size: 12px; color: var(--ctqui-muted); }
+.ctqui-row-arrow { color: var(--ctqui-muted); font-size: 16px; }
+
+/* Input form */
+.ctqui-form { padding: 14px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.ctqui-field { display: flex; flex-direction: column; gap: 5px; }
+.ctqui-field > label { font-size: 12.5px; font-weight: 600; color: var(--ctqui-text); }
+.ctqui-field .req { color: var(--ctqui-bad); }
+.ctqui-input,
+.ctqui-select {
+	width: 100%;
+	height: 38px;
+	padding: 0 11px;
+	border: 1px solid var(--ctqui-border);
+	border-radius: 9px;
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--ctqui-text);
+	font-family: inherit;
+	font-size: 13px;
+	outline: none;
+}
+.ctqui-input:focus,
+.ctqui-select:focus { border-color: var(--ctqui-accent); }
+.ctqui-input.invalid { border-color: var(--ctqui-bad); }
+.ctqui-select option { background: #15151c; }
+.ctqui-check { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 13px; }
+.ctqui-check input { width: 17px; height: 17px; accent-color: var(--ctqui-accent); }
+
+.ctqui-panel-foot { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--ctqui-border); }
+.ctqui-btn {
+	flex: 1;
+	height: 38px;
+	border: 1px solid var(--ctqui-border);
+	border-radius: 9px;
+	background: rgba(255, 255, 255, 0.04);
+	color: var(--ctqui-text);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: filter 0.12s ease, background 0.12s ease;
+}
+.ctqui-btn:hover { background: rgba(255, 255, 255, 0.09); }
+.ctqui-btn.primary { border: none; color: #fff; background: linear-gradient(135deg, var(--ctqui-accent), var(--ctqui-accent2)); }
+.ctqui-btn.primary:hover { filter: brightness(1.08); }
+
+/* Field helper text */
+.ctqui-field-desc { font-size: 11.5px; color: var(--ctqui-muted); margin-top: -2px; }
+
+/* Context item right value + submenu back */
+.ctqui-row-value {
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ctqui-accent);
+	background: color-mix(in srgb, var(--ctqui-accent) 16%, transparent);
+}
+.ctqui-back {
+	display: inline-grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	margin-bottom: 6px;
+	border: none;
+	border-radius: 7px;
+	background: rgba(255, 255, 255, 0.06);
+	color: var(--ctqui-text);
+	font-size: 14px;
+	cursor: pointer;
+}
+.ctqui-back:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* Toggle field (label left, switch right) */
+.ctqui-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ctqui-switch {
+	position: relative;
+	width: 42px;
+	height: 24px;
+	flex-shrink: 0;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.12);
+	cursor: pointer;
+	transition: background 0.18s ease;
+}
+.ctqui-switch.on { background: linear-gradient(135deg, var(--ctqui-accent), var(--ctqui-accent2)); }
+.ctqui-switch::after {
+	content: '';
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: #fff;
+	transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ctqui-switch.on::after { transform: translateX(18px); }
+
+/* Slider field */
+.ctqui-slider-row { display: flex; align-items: center; gap: 12px; }
+.ctqui-slider {
+	flex: 1;
+	-webkit-appearance: none;
+	appearance: none;
+	height: 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.12);
+	outline: none;
+}
+.ctqui-slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #fff;
+	border: 3px solid var(--ctqui-accent);
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.ctqui-slider-val {
+	min-width: 44px;
+	text-align: right;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ctqui-accent);
+}
+
+/* ── Skill check ─────────────────────────────────────────────────────────── */
+.ctqui-skill {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	padding: 26px 28px;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: var(--ctqui-radius);
+	backdrop-filter: blur(18px);
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+	animation: ctqui-pop-c 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ctqui-skill-title { font-size: 14px; font-weight: 700; }
+.ctqui-skill-ring { position: relative; width: 150px; height: 150px; }
+.ctqui-skill-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ctqui-skill-track { fill: none; stroke: rgba(255, 255, 255, 0.10); stroke-width: 9; }
+.ctqui-skill-zone { fill: none; stroke: var(--ctqui-accent); stroke-width: 9; stroke-linecap: round; }
+.ctqui-skill-pointer { fill: none; stroke: #fff; stroke-width: 9; stroke-linecap: round; }
+.ctqui-skill-key {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 52px;
+	height: 52px;
+	display: grid;
+	place-items: center;
+	border-radius: 14px;
+	font-size: 22px;
+	font-weight: 800;
+	color: #fff;
+	background: linear-gradient(135deg, var(--ctqui-accent), var(--ctqui-accent2));
+	box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+}
+.ctqui-skill.win .ctqui-skill-key { background: var(--ctqui-good); }
+.ctqui-skill.lose .ctqui-skill-key { background: var(--ctqui-bad); }
+.ctqui-skill-hint { font-size: 12px; color: var(--ctqui-muted); }
+
+/* ── Rich progress (icon + title + description + %) ───────────────────────── */
+.ctqui-progress-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ctqui-progress-icon {
+	flex-shrink: 0;
+	width: 34px; height: 34px;
+	display: grid; place-items: center;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--ctqui-accent) 18%, transparent);
+	color: var(--ctqui-accent);
+	font-size: 16px;
+}
+.ctqui-progress-main { flex: 1; min-width: 0; }
+.ctqui-progress-title { font-size: 13.5px; font-weight: 600; }
+.ctqui-progress-desc { font-size: 12px; color: var(--ctqui-muted); margin-top: 1px; }
+.ctqui-progress-percent { font-size: 13px; font-weight: 700; color: var(--ctqui-accent); }
+.ctqui-progress-foot { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+/* Context item status indicator */
+.ctqui-row-status { width: 22px; display: grid; place-items: center; font-size: 13px; }
+.ctqui-row-status.done { color: var(--ctqui-good); }
+.ctqui-row-status.active { color: var(--ctqui-accent); }
+.ctqui-row-status.locked { color: var(--ctqui-muted); }
+
+/* ── Controls panel (persistent keybind hints) ───────────────────────────── */
+#ctqui-controls {
+	position: fixed;
+	left: 24px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 232px;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	border-radius: var(--ctqui-radius);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+	overflow: hidden;
+	z-index: 40;
+	animation: ctqui-slide-in-l 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ctqui-controls-head { padding: 12px 14px; border-bottom: 1px solid var(--ctqui-border); }
+.ctqui-controls-title { font-size: 13px; font-weight: 700; }
+.ctqui-controls-sub { margin-top: 1px; font-size: 11px; color: var(--ctqui-muted); }
+.ctqui-controls-list { padding: 6px; }
+.ctqui-control-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 8px;
+	border-radius: 8px;
+	font-size: 13px;
+}
+.ctqui-control-row + .ctqui-control-row { margin-top: 1px; }
+
+/* ── Radial menu ─────────────────────────────────────────────────────────── */
+.ctqui-radial { position: relative; width: 300px; height: 300px; animation: ctqui-pop-c 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+.ctqui-radial-center {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 86px; height: 86px;
+	display: grid; place-items: center;
+	border-radius: 50%;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	backdrop-filter: blur(18px);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+	color: var(--ctqui-muted);
+	font-size: 22px;
+	cursor: pointer;
+	z-index: 2;
+	transition: color 0.14s ease;
+}
+.ctqui-radial-center:hover { color: var(--ctqui-text); }
+.ctqui-radial-center small { font-size: 10px; }
+.ctqui-radial-item {
+	position: absolute;
+	width: 84px;
+	margin-left: -42px;
+	margin-top: -42px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 5px;
+	border: none;
+	background: transparent;
+	color: var(--ctqui-text);
+	font-family: inherit;
+	cursor: pointer;
+}
+.ctqui-radial-icon {
+	width: 56px; height: 56px;
+	display: grid; place-items: center;
+	border-radius: 50%;
+	background: var(--ctqui-bg);
+	border: 1px solid var(--ctqui-border);
+	backdrop-filter: blur(14px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+	font-size: 22px;
+	transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
+}
+.ctqui-radial-item:hover .ctqui-radial-icon {
+	transform: scale(1.12);
+	background: color-mix(in srgb, var(--ctqui-accent) 28%, var(--ctqui-bg));
+	border-color: var(--ctqui-accent);
+}
+.ctqui-radial-label { font-size: 11.5px; color: var(--ctqui-muted); white-space: nowrap; }
+.ctqui-radial-item:hover .ctqui-radial-label { color: var(--ctqui-text); }
+
+@keyframes ctqui-slide-in-l {
+	from { opacity: 0; transform: translateY(-50%) translateX(-20px); }
+	to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
 /* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes ctqui-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ctqui-pop-c {
+	from { opacity: 0; transform: translateY(10px) scale(0.97); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
 @keyframes ctqui-slide-in {
 	from { opacity: 0; transform: translateX(24px) scale(0.96); }
 	to { opacity: 1; transform: translateX(0) scale(1); }

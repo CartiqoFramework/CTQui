@@ -42,6 +42,17 @@ exports('ShowTextUI', showTextUI)
 exports('HideTextUI', hideTextUI)
 exports('IsTextUIOpen', function() return textUiOpen end)
 
+-- ── Controls panel (persistent keybind hints) ───────────────────────────────
+-- ShowControls({ title?, items = { { label, key }, … } })  ·  HideControls()
+local function showControls(data)
+	send('controls:show', { title = data.title, items = data.items or {} })
+end
+local function hideControls()
+	send('controls:hide')
+end
+exports('ShowControls', showControls)
+exports('HideControls', hideControls)
+
 -- ── Progress bar (blocking) ─────────────────────────────────────────────────
 -- Progress({ label, duration, canCancel? }) -> boolean (true = completed, false = cancelled)
 local progressActive = false
@@ -54,7 +65,14 @@ local function progress(data)
 	progressResolve = p
 
 	SetNuiFocus(false, false) -- progress is non-interactive; ESC cancel handled by a key thread
-	send('progress:start', { label = data.label or 'Please wait', duration = data.duration or 3000, canCancel = data.canCancel ~= false })
+	send('progress:start', {
+		label = data.label or 'Please wait',
+		title = data.title,
+		icon = data.icon,
+		description = data.description,
+		duration = data.duration or 3000,
+		canCancel = data.canCancel ~= false,
+	})
 
 	-- Allow cancel with the X key (INPUT_FRONTEND_CANCEL = 177) when permitted.
 	if data.canCancel ~= false then
@@ -93,7 +111,24 @@ RegisterCommand('ctqui', function(_, args)
 		showTextUI('Press to interact', { key = 'E' })
 		SetTimeout(3000, hideTextUI)
 	elseif what == 'progress' then
-		local ok = progress({ label = 'Doing the thing…', duration = 4000, canCancel = true })
+		local ok = progress({
+			title = 'Initializing Hack',
+			icon = '💻',
+			description = 'Bypassing security protocols…',
+			duration = 5000,
+			canCancel = true,
+		})
 		notify({ description = ok and 'Completed!' or 'Cancelled.', type = ok and 'success' or 'error' })
+	elseif what == 'controls' then
+		showControls({
+			title = 'Controls',
+			items = {
+				{ label = 'Move Forward', key = 'W' },
+				{ label = 'Move Left', key = 'A' },
+				{ label = 'Confirm', key = 'SPACE' },
+				{ label = 'Cancel', key = 'X' },
+			},
+		})
+		SetTimeout(6000, hideControls)
 	end
 end, false)
